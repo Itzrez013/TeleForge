@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager,PermissionsMixin
+from django.core.validators import MinValueValidator,MaxValueValidator
 
 # Create your models here.
 
@@ -38,3 +39,9 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     def __str__(self):
         return f"{self.full_name} - {self.email}"
+
+
+class OTP(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='user_otp')
+    code = models.PositiveIntegerField(validators=[MinValueValidator(100000),MaxValueValidator(999999),])
+    sent_at = models.DateTimeField(auto_now=True)
