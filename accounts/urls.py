@@ -5,4 +5,5 @@ app_name = 'accounts'
 
 urlpatterns = [
     path('register/',views.RegisterView.as_view(),name='register'),
+    path('register/otp/',views.VerifyOTPAPIView.as_view(),name='otp'),
 ]

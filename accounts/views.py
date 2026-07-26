@@ -15,7 +15,8 @@ from .utils import send_activation_email
 class RegisterAPIView(APIView):
 
     def post(self, request):
-
+        if request.user.is_authenticated:
+            return Response({"Error":"لاگینی که همین الانشم کجا میخوای بری"})
         serializer = RegisterSerializer(
             data=request.data
         )
@@ -48,6 +49,79 @@ class RegisterAPIView(APIView):
                     "Verification code has been sent successfully."
                 },
                 status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class VerifyOTPAPIView(APIView):
+    def post(self, request):
+        if request.user.is_authenticated:
+            return Response({"Error":"لاگینی که همین الانشم کجا میخوای بری"})
+        serializer = VerifyOTPSerializer(
+            data=request.data
+        )
+
+        if serializer.is_valid():
+
+            email = serializer.validated_data["email"]
+            code = serializer.validated_data["code"]
+
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+
+                return Response(
+                    {
+                        "error": "User does not exist."
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            try:
+                otp = OTP.objects.get(user=user)
+            except OTP.DoesNotExist:
+
+                return Response(
+                    {
+                        "error": "OTP code does not exist."
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            if timezone.now() > otp.sent_at + timedelta(minutes=5):
+
+                otp.delete()
+
+                return Response(
+                    {
+                        "error": "OTP code has expired."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if otp.code != code:
+
+                return Response(
+                    {
+                        "error": "OTP code is incorrect."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            user.is_active = True
+            user.save()
+
+            otp.delete()
+
+            return Response(
+                {
+                    "message": "Your account has been activated successfully."
+                },
+                status=status.HTTP_200_OK
             )
 
         return Response(
