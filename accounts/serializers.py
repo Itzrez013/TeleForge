@@ -43,12 +43,12 @@ class VerifyOTPSerializer(serializers.Serializer):
     code = serializers.IntegerField(min_value=100000,max_value=999999)
 
 
-# class LoginSerializer(serializers.Serializer):
+class LoginSerializer(serializers.Serializer):
 
-#     email = serializers.EmailField()
-#     password = serializers.CharField(
-#         write_only=True
-#     )
+    email = serializers.EmailField()
+    password = serializers.CharField(
+        write_only=True
+    )
 
 
 # class ProfileSerializer(serializers.ModelSerializer):
