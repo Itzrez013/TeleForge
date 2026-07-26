@@ -12,7 +12,7 @@ from .utils import send_activation_email
 
 # Create your views here.
 
-class RegisterAPIView(APIView):
+class RegisterView(APIView):
 
     def post(self, request):
         if request.user.is_authenticated:
