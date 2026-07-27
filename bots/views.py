@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers.bot import (BotTokenSerializer,TelegramBotSerializer)
+from .serializers.bot import (BotTokenSerializer,TelegramBotSerializer,UpdateBotSerializer)
 from .serializers.command import (TelegramBotCommandsSerializer,AddCommandSerializer,UpdateCommandSerializer)
 from .serializers.response import (TelegramBotCommandResponseSerializer)
 
@@ -165,6 +165,43 @@ class BotDetailView(BaseBotMixin,APIView):
                 "Bot command created successfully."
             },
             status=status.HTTP_201_CREATED
+        )
+
+    def patch(self,request,bot_id):
+
+        bot = self.get_bot(bot_id)
+
+        serializer = UpdateBotSerializer(
+
+            bot,
+
+            data=request.data,
+
+            partial=True
+
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        bot = serializer.save()
+
+
+        return Response(
+
+            {
+                "message":
+                "Bot updated successfully.",
+
+                "bot":
+                TelegramBotSerializer(
+                    bot
+                ).data
+            },
+
+            status=status.HTTP_200_OK
+
         )
 
 class BotCommandDetailView(BaseBotMixin,APIView):
