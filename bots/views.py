@@ -5,13 +5,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import (
-    BotTokenSerializer,
-    TelegramBotSerializer,
-    TelegramBotCommandsSerializer,
-    TelegramBotCommandResponseSerializer,
-    AddCommandSerializer,
-)
+from .serializers.bot import (BotTokenSerializer,TelegramBotSerializer)
+from .serializers.command import (TelegramBotCommandsSerializer,AddCommandSerializer)
+from .serializers.response import (TelegramBotCommandResponseSerializer)
 
 from .utils import get_bot_information
 from .models import TelegramBot, CommandResponse, BotCommand
