@@ -23,3 +23,9 @@ class TelegramBotCommandResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommandResponse
         fields = ["command","text","created_at","updated_at"]
+
+
+class AddCommandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BotCommand
+        fields = ["bot","name","description"]

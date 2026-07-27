@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 import requests
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
-from .serializers import BotTokenSerializer,TelegramBotSerializer,TelegramBotCommandsSerializer,TelegramBotCommandResponseSerializer
+from .serializers import BotTokenSerializer,TelegramBotSerializer,TelegramBotCommandsSerializer,TelegramBotCommandResponseSerializer,AddCommandSerializer
 from .utils import get_bot_information
 from .models import TelegramBot,CommandResponse,BotCommand
 
@@ -74,6 +74,9 @@ class BotDetailViews(APIView):
         commands = bot.commands.all()
         return Response({"bot":TelegramBotSerializer(bot).data,
                         "commands":TelegramBotCommandsSerializer(commands,many=True).data})
+    # def post(self,request,bot_id):
+    #     bot = get_object_or_404(TelegramBot,id=bot_id,owner=request.user)
+
 
 
 class BotCommandDetailView(APIView):
