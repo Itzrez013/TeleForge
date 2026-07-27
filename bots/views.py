@@ -109,13 +109,20 @@ class GetTokenView(APIView):
         )
 
         return Response(
-            {
-                "message": "Bot added successfully.",
-                "bot_id": bot.id
-            },
-            status=status.HTTP_201_CREATED
-        )
 
+            {
+                "message":
+                "Bot added successfully.",
+
+                "bot":
+                TelegramBotSerializer(
+                    bot
+                ).data
+            },
+
+            status=status.HTTP_201_CREATED
+
+        )
 
 class BotDetailView(BaseBotMixin,APIView):
 
@@ -125,7 +132,7 @@ class BotDetailView(BaseBotMixin,APIView):
 
         bot = self.get_bot(bot_id)
 
-        commands = bot.commands.all()
+        commands = bot.commands.all().prefetch_related("responses")
 
         return Response(
             {
