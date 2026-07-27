@@ -211,6 +211,20 @@ class BotDetailView(BaseBotMixin,APIView):
 
         )
 
+    def delete(self, request, bot_id):
+
+        bot = self.get_bot(bot_id)
+
+        bot.delete()
+
+        return Response(
+            {
+                "message":
+                "Bot deleted successfully."
+            },
+            status=status.HTTP_200_OK
+        )
+
 class BotCommandDetailView(BaseBotMixin,APIView):
 
     permission_classes = [IsAuthenticated]
@@ -324,6 +338,22 @@ class BotCommandDetailView(BaseBotMixin,APIView):
 
         )
 
+    def delete(self, request, bot_id, command_id):
+
+        command = self.get_command(
+            bot_id,
+            command_id
+        )
+
+        command.delete()
+
+        return Response(
+            {
+                "message":
+                "Command deleted successfully."
+            },
+            status=status.HTTP_200_OK
+        )
 
 class CommandResponseDetailView(BaseBotMixin,APIView):
     permission_classes = [IsAuthenticated]
@@ -384,4 +414,28 @@ class CommandResponseDetailView(BaseBotMixin,APIView):
 
             status=status.HTTP_200_OK
 
+        )
+
+    def delete(
+            self,
+            request,
+            bot_id,
+            command_id,
+            response_id
+    ):
+
+        response = self.get_response(
+            bot_id,
+            command_id,
+            response_id
+        )
+
+        response.delete()
+
+        return Response(
+            {
+                "message":
+                "Response deleted successfully."
+            },
+            status=status.HTTP_200_OK
         )
