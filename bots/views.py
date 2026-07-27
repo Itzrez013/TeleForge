@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers.bot import (BotTokenSerializer,TelegramBotSerializer,UpdateBotSerializer)
 from .serializers.command import (TelegramBotCommandsSerializer,AddCommandSerializer,UpdateCommandSerializer)
-from .serializers.response import (TelegramBotCommandResponseSerializer)
+from .serializers.response import (TelegramBotCommandResponseSerializer,AddResponseSerializer)
 
 from .utils import get_bot_information
 from .models import TelegramBot, CommandResponse, BotCommand
@@ -231,6 +231,48 @@ class BotCommandDetailView(BaseBotMixin,APIView):
                 ).data
             }
         )
+
+    def post(self, request, bot_id, command_id):
+
+        command = self.get_command(
+            bot_id,
+            command_id
+        )
+
+        serializer = AddResponseSerializer(
+
+            data=request.data,
+
+            context={
+                "command": command
+            }
+
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        response = serializer.save(
+            command=command
+        )
+
+        return Response(
+
+            {
+                "message":
+                "Response created successfully.",
+
+                "response":
+                TelegramBotCommandResponseSerializer(
+                    response
+                ).data
+            },
+
+            status=status.HTTP_201_CREATED
+
+        )
+
 
     def patch(self, request, bot_id, command_id):
 
