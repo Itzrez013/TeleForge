@@ -74,8 +74,36 @@ class BotDetailViews(APIView):
         commands = bot.commands.all()
         return Response({"bot":TelegramBotSerializer(bot).data,
                         "commands":TelegramBotCommandsSerializer(commands,many=True).data})
-    # def post(self,request,bot_id):
-    #     bot = get_object_or_404(TelegramBot,id=bot_id,owner=request.user)
+    def post(self, request, bot_id):
+
+        bot = get_object_or_404(
+            TelegramBot,
+            id=bot_id,
+            owner=request.user
+        )
+
+        serializer = AddCommandSerializer(
+            data=request.data,
+            context={
+                "bot": bot
+            }
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        serializer.save(
+            bot=bot
+        )
+
+        return Response(
+            {
+                "message":
+                "Bot command created successfully."
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 
 
