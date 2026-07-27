@@ -316,3 +316,65 @@ class BotCommandDetailView(BaseBotMixin,APIView):
             status=status.HTTP_200_OK
 
         )
+
+
+class CommandResponseDetailView(BaseBotMixin,APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,bot_id,command_id,response_id):
+        response = self.get_response(
+            bot_id,
+            command_id,
+            response_id
+        )
+
+        return Response(
+
+            {
+                "response":
+                TelegramBotCommandResponseSerializer(
+                    response
+                ).data
+            }
+
+        )
+
+    def patch(self,request,bot_id,command_id,response_id):
+
+        response = self.get_response(
+            bot_id,
+            command_id,
+            response_id
+        )
+
+        serializer = UpdateResponseSerializer(
+
+            response,
+
+            data=request.data,
+
+            partial=True
+
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        response = serializer.save()
+
+        return Response(
+
+            {
+                "message":
+                "Response updated successfully.",
+
+                "response":
+                TelegramBotCommandResponseSerializer(
+                    response
+                ).data
+            },
+
+            status=status.HTTP_200_OK
+
+        )
