@@ -255,3 +255,4 @@ class DashboardView(APIView):
         profile = ProfileSerializer(request.user).data
         bot_list = TelegramBotSerializer(bots,many=True).data
         return Response({"profile":profile,"user_bot_list":bot_list})
+
