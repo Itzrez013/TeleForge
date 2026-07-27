@@ -7,15 +7,16 @@ from django.contrib.auth import login
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from .models import User, OTP
 from .serializers import (
     RegisterSerializer,
     VerifyOTPSerializer,
-    LoginSerializer,
+    LoginSerializer,ProfileSerializer
 )
 from .utils import send_activation_email
-
+from bots.serializers import TelegramBotSerializer
+from bots.models import TelegramBot
 
 class RegisterView(APIView):
 
@@ -247,3 +248,10 @@ class LoginView(APIView):
         )
 
 
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        bots = TelegramBot.objects.filter(owner=request.user)
+        profile = ProfileSerializer(request.user).data
+        bot_list = TelegramBotSerializer(bots,many=True).data
+        return Response({"profile":profile,"user_bot_list":bot_list})

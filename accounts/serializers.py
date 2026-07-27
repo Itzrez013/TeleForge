@@ -50,17 +50,15 @@ class LoginSerializer(serializers.Serializer):
         write_only=True
     )
 
+class ProfileSerializer(serializers.ModelSerializer):
 
-# class ProfileSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         model = User
-#         fields = [
-#             "email",
-#             "full_name",
-#             "created_at",
-#             "updated_at",
-#         ]
+    class Meta:
+        model = User
+        fields = [
+            "email",
+            "full_name",
+            "created_at",
+        ]
 
 
 # class ChangePasswordSerializer(serializers.Serializer):
