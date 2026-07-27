@@ -39,3 +39,31 @@ class AddResponseSerializer(serializers.ModelSerializer):
             )
 
         return value
+
+
+class UpdateResponseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommandResponse
+        fields = [
+            "text",
+        ]
+
+
+    def validate_text(self, value):
+
+        value = value.strip()
+
+        if not value:
+
+            raise serializers.ValidationError(
+                "Response text cannot be empty."
+            )
+
+        if len(value) > 4096:
+
+            raise serializers.ValidationError(
+                "Response text cannot exceed 4096 characters."
+            )
+
+        return value

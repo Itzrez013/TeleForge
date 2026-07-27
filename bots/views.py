@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers.bot import (BotTokenSerializer,TelegramBotSerializer,UpdateBotSerializer)
 from .serializers.command import (TelegramBotCommandsSerializer,AddCommandSerializer,UpdateCommandSerializer)
-from .serializers.response import (TelegramBotCommandResponseSerializer,AddResponseSerializer)
+from .serializers.response import (TelegramBotCommandResponseSerializer,AddResponseSerializer,UpdateResponseSerializer)
 
 from .utils import get_bot_information
 from .models import TelegramBot, CommandResponse, BotCommand
