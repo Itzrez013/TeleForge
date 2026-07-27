@@ -5,9 +5,9 @@ from rest_framework import status
 from rest_framework.response import Response
 import requests
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
-from .serializers import BotTokenSerializer
+from .serializers import BotTokenSerializer,TelegramBotSerializer,TelegramBotCommandsSerializer,TelegramBotCommandResponseSerializer
 from .utils import get_bot_information
-from .models import TelegramBot
+from .models import TelegramBot,CommandResponse,BotCommand
 
 
 # Create your views here.
@@ -66,3 +66,20 @@ class GetTokenView(APIView):
 
         )
 
+
+class BotDetailViews(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request,bot_id):
+        bot = get_object_or_404(TelegramBot,id=bot_id,owner=request.user)
+        commands = bot.commands.all()
+        return Response({"bot":TelegramBotSerializer(bot).data,
+                        "commands":TelegramBotCommandsSerializer(commands,many=True).data})
+
+
+class BotCommandDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request,bot_id,command_id):
+        command = get_object_or_404(BotCommand,id=command_id,bot__id=bot_id,bot__owner=request.user)
+        responses = command.responses.all()
+        return Response({"command":TelegramBotCommandsSerializer(command).data,
+                            "command_responses":TelegramBotCommandResponseSerializer(responses,many=True).data})
