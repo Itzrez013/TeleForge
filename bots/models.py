@@ -94,7 +94,7 @@ class CommandResponse(models.Model):
     command = models.OneToOneField(
         BotCommand,
         on_delete=models.CASCADE,
-        related_name="responses"
+        related_name="response"
     )
 
     text = models.TextField()

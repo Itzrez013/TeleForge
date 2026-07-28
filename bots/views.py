@@ -244,7 +244,7 @@ class BotCommandDetailView(BaseBotMixin,APIView):
             command_id
         )
 
-        responses = command.responses.all()
+        response = command.response
 
         return Response(
             {
@@ -255,8 +255,7 @@ class BotCommandDetailView(BaseBotMixin,APIView):
 
                 "command_responses":
                 TelegramBotCommandResponseSerializer(
-                    responses,
-                    many=True
+                    response
                 ).data
             }
         )
