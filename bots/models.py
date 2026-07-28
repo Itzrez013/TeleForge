@@ -27,7 +27,7 @@ class TelegramBot(models.Model):
         max_length=100
     )
 
-    is_active = models.BooleanField(
+    needs_sync = models.BooleanField(
         default=True
     )
 

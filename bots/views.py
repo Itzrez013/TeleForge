@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-
+from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -42,6 +42,13 @@ class BaseBotMixin:
             command__bot__owner=self.request.user
         )
 
+    def set_needs_sync(self,bot):
+
+        bot.needs_sync = True
+        bot.save(
+            update_fields=["needs_sync"]
+        )
+
 
 class GetTokenView(APIView):
 
@@ -71,8 +78,8 @@ class GetTokenView(APIView):
             )
 
         bot_id = data["id"]
-        username = data["username"]
-        name = data["first_name"]
+        username = data.get("username")
+        name = data.get("first_name")
 
         bot = TelegramBot.objects.filter(
             bot_id=bot_id
@@ -132,7 +139,7 @@ class BotDetailView(BaseBotMixin,APIView):
 
         bot = self.get_bot(bot_id)
 
-        commands = bot.commands.all().prefetch_related("responses")
+        commands = bot.commands.all()
 
         return Response(
             {
@@ -162,9 +169,9 @@ class BotDetailView(BaseBotMixin,APIView):
             raise_exception=True
         )
 
-        serializer.save(
-            bot=bot
-        )
+        with transaction.atomic():
+            serializer.save(bot=bot)
+            self.set_needs_sync(bot)
 
         return Response(
             {
@@ -192,8 +199,9 @@ class BotDetailView(BaseBotMixin,APIView):
             raise_exception=True
         )
 
-        bot = serializer.save()
-
+        with transaction.atomic():
+            bot = serializer.save()
+            self.set_needs_sync(bot)
 
         return Response(
 
@@ -274,9 +282,9 @@ class BotCommandDetailView(BaseBotMixin,APIView):
             raise_exception=True
         )
 
-        response = serializer.save(
-            command=command
-        )
+        with transaction.atomic():
+            response = serializer.save(command=command)
+            self.set_needs_sync(command.bot)
 
         return Response(
 
@@ -320,7 +328,9 @@ class BotCommandDetailView(BaseBotMixin,APIView):
             raise_exception=True
         )
 
-        command = serializer.save()
+        with transaction.atomic():
+            command = serializer.save()
+            self.set_needs_sync(command.bot)
 
         return Response(
 
@@ -345,7 +355,9 @@ class BotCommandDetailView(BaseBotMixin,APIView):
             command_id
         )
 
-        command.delete()
+        with transaction.atomic():
+            self.set_needs_sync(command.bot)
+            command.delete()
 
         return Response(
             {
@@ -398,7 +410,9 @@ class CommandResponseDetailView(BaseBotMixin,APIView):
             raise_exception=True
         )
 
-        response = serializer.save()
+        with transaction.atomic():
+            response = serializer.save()
+            self.set_needs_sync(response.command.bot)
 
         return Response(
 
@@ -430,7 +444,9 @@ class CommandResponseDetailView(BaseBotMixin,APIView):
             response_id
         )
 
-        response.delete()
+        with transaction.atomic():
+            self.set_needs_sync(response.command.bot)
+            response.delete()
 
         return Response(
             {

@@ -16,7 +16,7 @@ from .serializers import (
     LoginSerializer,ProfileSerializer
 )
 from .utils import send_activation_email
-from bots.serializers import TelegramBotSerializer
+from bots.serializers.bot import TelegramBotSerializer
 from bots.models import TelegramBot
 
 class RegisterView(APIView):
