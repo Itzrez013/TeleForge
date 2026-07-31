@@ -5,12 +5,15 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from django.conf import settings
+
 from .serializers.bot import (BotTokenSerializer,TelegramBotSerializer,UpdateBotSerializer)
 from .serializers.command import (TelegramBotCommandsSerializer,AddCommandSerializer,UpdateCommandSerializer)
 from .serializers.response import (TelegramBotCommandResponseSerializer,AddResponseSerializer,UpdateResponseSerializer)
 
 from .utils import get_bot_information
 from .models import TelegramBot, CommandResponse, BotCommand
+from .telegram import *
 
 
 class BaseBotMixin:
@@ -232,6 +235,25 @@ class BotDetailView(BaseBotMixin,APIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+class BotDeactivateView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,bot_id):
+        bot = self.get_bot(bot_id)
+
+        if not sync_bot(bot, settings.WEBHOOK_URL):
+            return Response(
+                {"error": "Sync failed"},
+                status=400
+            )
+
+        return Response({
+            "message": "Bot synced successfully."
+        })
+
+
+
 
 class BotCommandDetailView(BaseBotMixin,APIView):
 
