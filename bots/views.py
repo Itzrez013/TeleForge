@@ -237,7 +237,24 @@ class BotDetailView(BaseBotMixin,APIView):
         )
 
 
-class BotDeactivateView(APIView):
+class BotDeactivateView(BaseBotMixin,APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,bot_id):
+        bot = self.get_bot(bot_id)
+
+        if not deactivate_bot(bot):
+            return Response(
+                {"error": "Failed"}
+            )
+
+        return Response(
+            {
+                "message": "Bot deactivated successfully."
+            },
+            status=status.HTTP_200_OK
+        )
+
+class BotSyncView(BaseBotMixin,APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,bot_id):
         bot = self.get_bot(bot_id)
@@ -248,12 +265,12 @@ class BotDeactivateView(APIView):
                 status=400
             )
 
-        return Response({
-            "message": "Bot synced successfully."
-        })
-
-
-
+        return Response(
+            {
+                "message": "Bot Synced successfully."
+            },
+            status=status.HTTP_200_OK
+        )
 
 class BotCommandDetailView(BaseBotMixin,APIView):
 
@@ -266,7 +283,10 @@ class BotCommandDetailView(BaseBotMixin,APIView):
             command_id
         )
 
-        response = command.response
+        try:
+            response = command.response
+        except CommandResponse.DoesNotExist:
+            response = None
 
         return Response(
             {
