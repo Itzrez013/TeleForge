@@ -158,6 +158,8 @@ EMAIL_PORT = config("EMAIL_PORT")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS",cast=bool)
 
 
+WEBHOOK_URL = "https://wbrah.ir/bots/webhook/"
+
 
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:3000",
