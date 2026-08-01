@@ -5,6 +5,7 @@ app_name = 'bots'
 
 urlpatterns = [
     path('get-token/',views.GetTokenView.as_view(),name='get_token'),
+    path('bots/webhooks/',views.TelegramWebhookView.as_view(),name='telegram_webhook'),
     path('bots/<int:bot_id>/deactivate/',views.BotDeactivateView.as_view(),name='bot_deactivate'),
     path('bots/<int:bot_id>/sync/',views.BotSyncView.as_view(),name='bot_deactivate'),    
     path('bots/<int:bot_id>/',views.BotDetailView.as_view(),name='bots'),

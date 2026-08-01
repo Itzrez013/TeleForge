@@ -118,8 +118,8 @@ def set_webhook(
         "setWebhook",
 
         {
-            "url":
-            webhook_url
+            "url": webhook_url,
+            "secret_token": bot.webhook_secret,
         }
 
     )

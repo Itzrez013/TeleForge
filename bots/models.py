@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import User
+import secrets
 
 
 class TelegramBot(models.Model):
@@ -37,6 +38,12 @@ class TelegramBot(models.Model):
 
     updated_at = models.DateTimeField(
         auto_now=True
+    )
+
+    webhook_secret = models.CharField(
+        max_length=64,
+        unique=True,
+        default=secrets.token_hex
     )
 
 

@@ -3,7 +3,7 @@ from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 
 from django.conf import settings
 
@@ -496,3 +496,58 @@ class CommandResponseDetailView(BaseBotMixin,APIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+class TelegramWebhookView(APIView):
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+
+        secret = request.headers.get(
+            "X-Telegram-Bot-Api-Secret-Token"
+        )
+
+        if not secret:
+            return Response(status=403)
+
+        bot = get_object_or_404(
+            TelegramBot,
+            webhook_secret=secret
+        )
+
+        message = request.data.get("message")
+
+        if not message:
+            return Response(status=200)
+
+        text = message.get("text")
+
+        if not text:
+            return Response(status=200)
+
+        chat_id = message["chat"]["id"]
+
+        command = (
+            BotCommand.objects
+            .select_related("responses")
+            .filter(
+                bot=bot,
+                name=text
+            )
+            .first()
+        )
+
+        if not command:
+            return Response(status=200)
+
+        if not hasattr(command, "responses"):
+            return Response(status=200)
+
+        send_message(
+            bot,
+            chat_id,
+            command.responses.text
+        )
+
+        return Response(status=200)
