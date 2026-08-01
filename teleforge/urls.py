@@ -31,13 +31,13 @@ urlpatterns = [
     path('',include('bots.urls',namespace='bots')),
     #!spactacular
     path(
-        "api/schema/",
+        "schema/",
         SpectacularAPIView.as_view(),
         name="schema"
     ),
 
     path(
-        "api/docs/",
+        "docs/",
         SpectacularSwaggerView.as_view(
             url_name="schema"
         ),
@@ -45,7 +45,7 @@ urlpatterns = [
     ),
 
     path(
-        "api/redoc/",
+        "redoc/",
         SpectacularRedocView.as_view(
             url_name="schema"
         ),
