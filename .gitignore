@@ -55,6 +55,11 @@ cover/
 *.mo
 *.pot
 
+# host
+stderr.log
+tmp/
+public/
+
 # Django stuff:
 *.log
 local_settings.py
