@@ -10,7 +10,6 @@ class TelegramBotSerializer(serializers.ModelSerializer):
         fields = ["bot_id",
                   "username",
                   "name",
-                  "is_acrive",
                   "created_at",
                   "updated_at"]
 

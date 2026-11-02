@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from django.contrib.auth.password_validation import validate_password
 
@@ -49,6 +51,28 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(
         write_only=True
     )
+
+
+class LogoutSerializer(serializers.Serializer):
+
+    refresh = serializers.CharField(write_only=True)
+
+    def validate_refresh(self, value):
+        try:
+            refresh_token = RefreshToken(value)
+        except TokenError as exc:
+            raise serializers.ValidationError(
+                "Invalid or expired refresh token."
+            ) from exc
+
+        request_user_id = str(self.context["request"].user.pk)
+        if str(refresh_token["user_id"]) != request_user_id:
+            raise serializers.ValidationError(
+                "Refresh token does not belong to the authenticated user."
+            )
+
+        return refresh_token
+
 
 class ProfileSerializer(serializers.ModelSerializer):
 
