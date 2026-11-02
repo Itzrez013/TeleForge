@@ -1,36 +1,43 @@
-from django.shortcuts import get_object_or_404
-from random import randint
+import secrets
 from datetime import timedelta
 
 from django.db import transaction
 from django.utils import timezone
-from django.contrib.auth import login
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated,IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, OTP
 from .serializers import (
     RegisterSerializer,
     VerifyOTPSerializer,
-    LoginSerializer,ProfileSerializer
+    LoginSerializer,
+    LogoutSerializer,
+    ProfileSerializer,
 )
 from .utils import send_activation_email
 from bots.serializers.bot import TelegramBotSerializer
 from bots.models import TelegramBot
 
+
+def _token_response(user, message):
+    refresh = RefreshToken.for_user(user)
+    return Response(
+        {
+            "message": message,
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
 class RegisterView(APIView):
 
+    permission_classes = [AllowAny]
+
     def post(self, request):
-
-        if request.user.is_authenticated:
-            return Response(
-                {
-                    "error": "You are already logged in."
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -38,10 +45,7 @@ class RegisterView(APIView):
 
             user = serializer.save()
 
-            random_code = randint(
-                100000,
-                999999
-            )
+            random_code = secrets.randbelow(900000) + 100000
 
             OTP.objects.update_or_create(
                 user=user,
@@ -67,16 +71,9 @@ class RegisterView(APIView):
 
 class VerifyOTPAPIView(APIView):
 
+    permission_classes = [AllowAny]
+
     def post(self, request):
-
-        if request.user.is_authenticated:
-            return Response(
-                {
-                    "error": "You are already logged in."
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         serializer = VerifyOTPSerializer(
             data=request.data
         )
@@ -136,29 +133,17 @@ class VerifyOTPAPIView(APIView):
 
             otp.delete()
 
-        login(request, user)
-
-        return Response(
-            {
-                "message":
-                "Your account has been activated successfully."
-            },
-            status=status.HTTP_200_OK
+        return _token_response(
+            user,
+            "Your account has been activated successfully.",
         )
 
 
 class LoginView(APIView):
 
+    permission_classes = [AllowAny]
+
     def post(self, request):
-
-        if request.user.is_authenticated:
-            return Response(
-                {
-                    "error": "You are already logged in."
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         serializer = LoginSerializer(
             data=request.data
         )
@@ -177,7 +162,7 @@ class LoginView(APIView):
                     "error":
                     "Email or password is incorrect."
                 },
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         if not user.check_password(password):
@@ -195,10 +180,7 @@ class LoginView(APIView):
             otp, created = OTP.objects.get_or_create(
                 user=user,
                 defaults={
-                    "code": randint(
-                        100000,
-                        999999
-                    )
+                    "code": secrets.randbelow(900000) + 100000
                 }
             )
 
@@ -216,10 +198,7 @@ class LoginView(APIView):
                     status=status.HTTP_429_TOO_MANY_REQUESTS
                 )
 
-            random_code = randint(
-                100000,
-                999999
-            )
+            random_code = secrets.randbelow(900000) + 100000
 
             otp.code = random_code
             otp.save()
@@ -238,20 +217,31 @@ class LoginView(APIView):
                 status=status.HTTP_200_OK
             )
 
-        login(request, user)
+        return _token_response(user, "Welcome to TeleForge.")
+
+
+class LogoutView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = LogoutSerializer(
+            data=request.data,
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data["refresh"].blacklist()
 
         return Response(
-            {
-                "message":
-                "Welcome to TeleForge."
-            },
-            status=status.HTTP_200_OK
+            {"message": "Logged out successfully."},
+            status=status.HTTP_200_OK,
         )
 
 
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self,request):
+
+    def get(self, request):
         bots = TelegramBot.objects.filter(owner=request.user)
         profile = ProfileSerializer(request.user).data
         bot_list = TelegramBotSerializer(bots,many=True).data
