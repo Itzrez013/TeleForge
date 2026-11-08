@@ -14,7 +14,8 @@ def make_request(
 
         f"{BASE_URL}{token}/{method}",
 
-        json=data
+        json=data,
+        timeout=10,
 
     )
 

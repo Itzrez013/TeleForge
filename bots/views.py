@@ -244,7 +244,8 @@ class BotDeactivateView(BaseBotMixin,APIView):
 
         if not deactivate_bot(bot):
             return Response(
-                {"error": "Failed"}
+                {"error": "Failed to deactivate bot."},
+                status=status.HTTP_502_BAD_GATEWAY,
             )
 
         return Response(
@@ -526,14 +527,24 @@ class TelegramWebhookView(APIView):
         if not text:
             return Response(status=200)
 
+        parts = text.split(maxsplit=1)
+        if not parts:
+            return Response(status=200)
+
+        command_name = parts[0]
+        if "@" in command_name:
+            command_name, bot_username = command_name.split("@", 1)
+            if bot_username.casefold() != bot.username.casefold():
+                return Response(status=200)
+
         chat_id = message["chat"]["id"]
 
         command = (
             BotCommand.objects
-            .select_related("responses")
+            .select_related("response")
             .filter(
                 bot=bot,
-                name=text
+                name=command_name.lower()
             )
             .first()
         )
@@ -541,13 +552,13 @@ class TelegramWebhookView(APIView):
         if not command:
             return Response(status=200)
 
-        if not hasattr(command, "responses"):
+        if not hasattr(command, "response"):
             return Response(status=200)
 
         send_message(
             bot,
             chat_id,
-            command.responses.text
+            command.response.text
         )
 
         return Response(status=200)

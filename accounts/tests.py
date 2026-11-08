@@ -154,4 +154,49 @@ class JWTAuthenticationTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotIn("access", response.data)
+        self.assertTrue(response.data["verification_required"])
+        send_email.assert_called_once()
+
+    @patch("accounts.views.send_activation_email")
+    def test_inactive_login_uses_existing_code_during_resend_cooldown(
+        self,
+        send_email,
+    ):
+        self.user.is_active = False
+        self.user.save(update_fields=["is_active"])
+        OTP.objects.create(user=self.user, code=123456)
+
+        response = self.client.post(
+            reverse("accounts:login"),
+            {
+                "email": self.user.email,
+                "password": "SecurePassword123!",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["verification_required"])
+        self.assertNotIn("access", response.data)
+        send_email.assert_not_called()
+
+    @patch("accounts.views.send_activation_email")
+    def test_registration_leaves_account_inactive_until_code_is_verified(
+        self,
+        send_email,
+    ):
+        response = self.client.post(
+            reverse("accounts:register"),
+            {
+                "email": "new-user@example.com",
+                "full_name": "New User",
+                "password": "SecurePassword123!",
+            },
+            format="json",
+        )
+
+        user = get_user_model().objects.get(email="new-user@example.com")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertFalse(user.is_active)
+        self.assertTrue(OTP.objects.filter(user=user).exists())
         send_email.assert_called_once()

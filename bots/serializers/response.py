@@ -40,6 +40,15 @@ class AddResponseSerializer(serializers.ModelSerializer):
 
         return value
 
+    def validate(self, attrs):
+        command = self.context.get("command")
+        if command and CommandResponse.objects.filter(command=command).exists():
+            raise serializers.ValidationError(
+                "A response already exists for this command."
+            )
+
+        return attrs
+
 
 class UpdateResponseSerializer(serializers.ModelSerializer):
 

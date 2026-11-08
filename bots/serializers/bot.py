@@ -19,7 +19,6 @@ class UpdateBotSerializer(serializers.ModelSerializer):
         model = TelegramBot
         fields = [
             "name",
-            "is_active",
         ]
 
 

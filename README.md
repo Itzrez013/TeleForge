@@ -20,3 +20,18 @@ on use, so persist the newly returned refresh token securely in the Flutter
 client. Sign out with an authenticated `POST /logout/` containing the current
 refresh token; this revokes it. Django sessions remain enabled for the built-in
 admin, but are not used to authenticate REST API requests.
+
+## Production domains
+
+The production frontend origin is `https://teleforge.ir`; the API and Telegram
+webhook use `https://api.teleforge.ir`. CORS is restricted to the frontend
+origin in production. Local development CORS origins are enabled only when
+`DEBUG=True`. The API host is included in `ALLOWED_HOSTS`; any additional host
+names can be supplied through the `ALLOWED_HOSTS` environment variable.
+
+Set `DEBUG=False` in the production environment. This enables HTTPS
+redirection, secure session/CSRF cookies, and one year of HSTS for the API
+host by default. Keep the API reachable over HTTPS before enabling HSTS. If TLS
+terminates at a reverse proxy, set
+`USE_X_FORWARDED_PROTO=True` only when that trusted proxy removes any
+client-supplied `X-Forwarded-Proto` header and sets the correct value itself.

@@ -192,10 +192,11 @@ class LoginView(APIView):
 
                 return Response(
                     {
-                        "error":
-                        "Please wait 60 seconds before requesting another code."
+                        "message":
+                        "Your account is not active. Enter the verification code already sent to your email.",
+                        "verification_required": True,
                     },
-                    status=status.HTTP_429_TOO_MANY_REQUESTS
+                    status=status.HTTP_200_OK
                 )
 
             random_code = secrets.randbelow(900000) + 100000
@@ -212,7 +213,8 @@ class LoginView(APIView):
             return Response(
                 {
                     "message":
-                    "Your account is not active. A new verification code has been sent to your email."
+                    "Your account is not active. A new verification code has been sent to your email.",
+                    "verification_required": True,
                 },
                 status=status.HTTP_200_OK
             )

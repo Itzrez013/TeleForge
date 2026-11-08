@@ -62,7 +62,7 @@ class BotCommand(models.Model):
     )
 
     name = models.CharField(
-        max_length=30
+        max_length=32
     )
 
     description = models.CharField(

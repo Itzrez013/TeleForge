@@ -1,7 +1,7 @@
 import sys
 import os
 
-project_home = '/home3/jztiukpl/TeleForge'
+project_home = 'TeleForge/'
 if project_home not in sys.path:
     sys.path.insert(0, project_home)
 
