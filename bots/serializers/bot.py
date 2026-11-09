@@ -7,7 +7,9 @@ class BotTokenSerializer(serializers.Serializer):
 class TelegramBotSerializer(serializers.ModelSerializer):
     class Meta:
         model = TelegramBot
-        fields = ["bot_id",
+        fields = [
+                  "id",
+                  "bot_id",
                   "username",
                   "name",
                   "created_at",
