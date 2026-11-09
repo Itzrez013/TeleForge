@@ -74,9 +74,10 @@ SIMPLE_JWT = {
 
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -175,6 +176,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://teleforge.ir",
     "https://api.teleforge.ir",
 ]
+
+CORS_ALLOW_CREDENTIALS = False
+
 if DEBUG:
     CORS_ALLOWED_ORIGINS.extend(
         [
