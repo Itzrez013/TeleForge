@@ -112,8 +112,12 @@ WSGI_APPLICATION = 'teleforge.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": config("DATABASE_ENGINE"),
-        "NAME": BASE_DIR / config("DATABASE_NAME"),
+        'ENGINE': config("DATABASE_ENGINE"),
+        'NAME': config("DATABASE_NAME"),
+        'USER': config("DATABASE_USERNAME"),
+        'PASSWORD': config("DATABASE_USER_PASSWORD"),
+        'HOST': config("DATABASE_HOST"),
+        'PORT': config("DATABASE_PORT"),
     }
 }
 
