@@ -24,7 +24,7 @@ admin, but are not used to authenticate REST API requests.
 ## Production domains
 
 The production frontend origin is `https://teleforge.ir`; the API and Telegram
-webhook use `https://api.teleforge.ir`. CORS is restricted to the frontend
+webhook use `https://wbrah.ir/teleforge`. CORS is restricted to the frontend
 origin in production. Local development CORS origins are enabled only when
 `DEBUG=True`. The API host is included in `ALLOWED_HOSTS`; any additional host
 names can be supplied through the `ALLOWED_HOSTS` environment variable.
