@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     'accounts.apps.AccountsConfig',
     'bots.apps.BotsConfig',
+    'general.apps.GeneralConfig',
 ]
 
 

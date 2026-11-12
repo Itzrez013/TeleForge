@@ -29,6 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('accounts.urls',namespace='accounts')),
     path('',include('bots.urls',namespace='bots')),
+    path('',include('general.urls',namespace='general')),
     #!spactacular
     path(
         "schema/",
