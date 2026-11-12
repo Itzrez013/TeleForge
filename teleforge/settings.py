@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'bots.apps.BotsConfig',
     'general.apps.GeneralConfig',
+    'persiantools',
 ]
 
 
