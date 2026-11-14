@@ -175,12 +175,12 @@ EMAIL_PORT = config("EMAIL_PORT")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS",cast=bool)
 
 
-WEBHOOK_URL = "https://wbrah.ir/teleforge/bots/webhooks/"
+WEBHOOK_URL = "https://api.teleforge.ir/bots/webhooks/"
 
 CORS_ALLOWED_ORIGINS = ["https://teleforge.ir"]
 CSRF_TRUSTED_ORIGINS = [
     "https://teleforge.ir",
-    "https://wbrah.ir",
+    "https://api.teleforge.ir",
 ]
 
 CORS_ALLOW_CREDENTIALS = False
