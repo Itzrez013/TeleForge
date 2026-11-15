@@ -9,3 +9,4 @@ media/
 __pypackages__/
 .env
 passenger_wsgi.py
+.cpanel.yml
