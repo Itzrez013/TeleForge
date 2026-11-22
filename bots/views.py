@@ -248,6 +248,7 @@ class BotDeactivateView(BaseBotMixin,APIView):
                 status=status.HTTP_502_BAD_GATEWAY,
             )
 
+        bot.delete()
         return Response(
             {
                 "message": "Bot deactivated successfully."
