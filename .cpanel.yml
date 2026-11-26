@@ -1,0 +1,3 @@
+deployment:
+  tasks:
+    - /usr/bin/touch /home3/jztiukpl/TeleForge/tmp/restart.txt
